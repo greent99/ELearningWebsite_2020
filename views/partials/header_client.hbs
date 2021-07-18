@@ -1,0 +1,153 @@
+<div class="header-top bg-theme-color-2 sm-text-center p-0">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4">
+                <div class="widget no-border m-0">
+                    <ul class="list-inline font-13 sm-text-center mt-5">
+                        {{#if isAuth}}
+                            <form id="frmLogout" method="POST" action="/auth/logout" hidden></form>
+                            <li>
+                                <a class="text-white" href="/users/detail/{{authUser.id}}">{{authUser.fullname}}</a>
+                            </li>
+                            <li class="text-white">|</li>
+                            <li>
+                                <a class="text-white" href="javascript: $('#frmLogout').submit();">Logout</a>
+                            </li>
+                            {{#if (isAdmin authUser.role)}}
+                                <li class="text-white">|</li>
+                                <li>
+                                    <a class="text-white" href="/admin">Admin page</a>
+                                </li>
+                            {{/if}}
+                            {{#if authUser.isvalid}}
+                            {{else}}
+                                <li class="text-white">|</li>
+                                <li>
+                                    <a class="text-white" href="/users/otp">Resend email OTP</a>
+                                </li>
+                            {{/if}}
+                        {{else}}
+                            <li>
+                                <a class="text-white" href="/auth">Login Or Register</a>
+                            </li>
+                        {{/if}}
+                    </ul>
+                </div>
+            </div>
+            <div class="col-md-8">
+                <div class="widget m-0 pull-right sm-pull-none sm-text-center">
+                    <ul class="list-inline pull-right">
+                        <li class="mb-0 pb-0">
+                            {{#if cart}}
+                                <div class="top-dropdown-outer pt-5 pb-10">
+                                    <a class="top-cart-link has-dropdown text-white text-hover-theme-colored"><i
+                                            class="fa fa-shopping-cart font-13"></i> ({{cart.courses.length}})</a>
+                                    <ul class="dropdown">
+                                        {{#if cart.courses.length}}
+                                            <li>
+                                                <!-- dropdown cart -->
+                                                <div class="dropdown-cart">
+                                                    <table class="table cart-table-list table-responsive">
+                                                        <tbody>
+                                                        {{# each cart.courses}}
+                                                            <tr>
+                                                                <td><a href="/courses/{{this.id}}"><img alt="product"
+                                                                                                        src="/assets/client/images/courses/{{this.id}}.png"
+                                                                                                        onerror="this.onerror=null; this.src='/assets/client/images/not-found.jpg'"></a>
+                                                                </td>
+                                                                <td><a href="/courses/{{this.id}}">{{this.name}}</a></td>
+                                                                <td>{{this.price}} VND</td>
+                                                                <td><a class="close" href="javascript: $('form#removeFromCartHeader input').val({{this.id}}); $('form#removeFromCartHeader').submit();"><i
+                                                                        class="fa fa-close font-13"></i></a></td>
+                                                            </tr>
+                                                        {{/each}}
+                                                        </tbody>
+                                                    </table>
+                                                    <div class="total-cart text-right">
+                                                        <table class="table table-responsive">
+                                                            <tbody>
+                                                            <tr>
+                                                                <td>Amount</td>
+                                                                <td>{{format cart.amount}} VND</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>Discount</td>
+                                                                <td>{{format cart.discountamount}} VND</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>Total</td>
+                                                                <td>{{format cart.total}} VND</td>
+                                                            </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                    <form id="checkoutCartHeader"
+                                                          action="/cart/checkout" method="POST" hidden>
+                                                    </form>
+                                                    <div class="cart-btn text-right">
+                                                        <a class="btn btn-dark btn-xs" href="javascript: $('form#checkoutCartHeader').submit();">
+                                                            Checkout</a>
+                                                    </div>
+                                                </div>
+                                                <!-- dropdown cart ends -->
+                                            </li>
+                                        {{else}}
+                                            <li>
+                                                <img src="/assets/client/images/empty-cart.png" alt="empty-cart">
+                                            </li>
+                                        {{/if}}
+                                    </ul>
+                                </div>
+                            {{/if}}
+                        </li>
+                        <li class="mb-0 pb-0">
+                            <div class="top-dropdown-outer pt-5 pb-10">
+                                <a href="/courses" class="top-search-box has-dropdown text-white text-hover-theme-colored"><i
+                                        class="fa fa-search font-13"></i> Search</a>
+<!--                                <ul class="dropdown">-->
+<!--                                    <li>-->
+<!--                                        <div class="search-form-wrapper">-->
+<!--                                            <form method="get" class="mt-10">-->
+<!--                                                <input type="text"-->
+<!--                                                       onfocus="if(this.value =='Enter your search') { this.value = ''; }"-->
+<!--                                                       onblur="if(this.value == '') { this.value ='Enter your search'; }"-->
+<!--                                                       value="Enter your search" id="searchinput" name="s" class="">-->
+<!--                                                <label><input type="submit" name="submit" value=""></label>-->
+<!--                                            </form>-->
+<!--                                        </div>-->
+<!--                                    </li>-->
+<!--                                </ul>-->
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="header-middle p-0 bg-lightest xs-text-center">
+    <div class="container pt-0 pb-0">
+        <div class="row">
+            <div class="col-xs-12 col-sm-4 col-md-5">
+                <div class="widget no-border m-0">
+                    <a class="menuzord-brand pull-left flip xs-pull-center mb-15" href="/"><img
+                            src="/images/logo81.png" alt=""></a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{{#if isAuth}}
+    <form id="removeFromCartHeader"
+          action="/cart?_method=DELETE" method="POST" hidden>
+        <input type="text" name="courseid">
+    </form>
+    <form id="addToCartHeader"
+          action="/cart" method="POST" hidden>
+        <input type="text" name="courseid">
+    </form>
+    <form id="addToWatchListHeader"
+          action="/users/{{{authUser.id}}}/watch-list" method="POST" hidden>
+        <input type="text" name="courseid">
+    </form>
+{{/if}}

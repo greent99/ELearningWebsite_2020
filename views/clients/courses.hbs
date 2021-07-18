@@ -1,0 +1,211 @@
+{{#section 'css'}}
+<style>
+    form.example input[type=text] {
+  padding: 10px;
+  font-size: 17px;
+  border: 1px solid grey;
+  float: left;
+  width: 80%;
+  background: #f1f1f1;
+}
+
+form.example button {
+  float: left;
+  width: 20%;
+  padding: 10px;
+  background: #2196F3;
+  color: white;
+  font-size: 17px;
+  border: 1px solid grey;
+  border-left: none;
+  cursor: pointer;
+}
+
+form.example button:hover {
+  background: #0b7dda;
+}
+
+form.example::after {
+  content: "";
+  clear: both;
+  display: table;
+}
+</style>
+{{/section}}
+
+{{#section 'js'}}
+    <script>
+        $(document).ready(function() {
+            $('.pagination').each(function () {
+                const pageIndex = {{data.pageIndex}};
+                if (pageIndex !== 1) {
+                    $(this).append(`<li class="page-item">
+                    <a class="page-link" href="/courses/?pageIndex=${pageIndex - 1}&pageSize={{data.pageSize}}" tabindex="-1">Previous</a>
+                </li>`)
+                }
+                for (let i = 1; i <= {{data.totalPages}}; i++) {
+                    if (i === pageIndex) {
+                        $(this).append(`<li class="page-item active">
+                    <a class="page-link" href="/courses?pageIndex=${i}&pageSize={{data.pageSize}}">${i} <span class="sr-only">(current)</span></a>
+                </li>`)
+                    } else {
+                        $(this).append(`<li class="page-item"><a class="page-link" href="/courses?pageIndex=${i}&pageSize={{data.pageSize}}">${i}</a></li>`)
+                    }
+                }
+                if (pageIndex !== {{data.totalPages}}) {
+                    $(this).append(`<li class="page-item">
+                    <a class="page-link" href="/courses/?pageIndex=${pageIndex + 1}&pageSize={{data.pageSize}}">Next</a>
+                </li>`);
+                }
+            })
+
+            $('a.page-link').on('click', function (e) {
+                e.preventDefault();
+                let thisHref = $(this).attr('href');
+                thisHref += `{{#if data.categoryId}}&categoryid={{data.categoryId}}{{else}}{{#if data.fieldId}}&fieldid={{data.fieldId}}{{/if}}{{/if}}{{#if data.keyword}}&keyword={{data.keyword}}{{/if}}{{#if data.keyword}}&searchType={{data.searchType}}{{/if}}`;
+                $(this).attr('href', thisHref);
+                $(this).off('click').trigger('click');
+            });
+
+            const userCourseIds = "{{data.userCourseIds}}";
+            const userUploadIds = "{{data.userUploadIds}}";
+            let courseIdsInCart = "";
+            {{#if cart}}
+                {{#each cart.courses}}
+                    courseIdsInCart += '{{this.id}}'
+                {{/each}}
+            {{/if}}
+            $("div.actionButton").each(function () {
+                const id = $(this).attr('data-id');
+                if (!userCourseIds.includes(id.toString()) && !userUploadIds.includes(id.toString()) && !courseIdsInCart.includes(id.toString())) {
+                    $(this).append(`<a href="javascript: $('form#addToCartHeader input').val(${id}); $('form#addToCartHeader').submit();"
+                                    style="height: 35px; margin-top: 10px;" class="btn btn-dark"><i class="fa fa-cart-plus"></i></a>`)
+                }
+            });
+        });
+
+        function sortUsingNestedTextAsc(parent, childSelector, keySelector) {
+            const items = parent.children(childSelector).sort(function(a, b) {
+                let vA = $(keySelector, a).text();
+                if (vA.includes(' VND')) {
+                	vA = vA.split(' ');
+                	vA = vA.slice(0, vA.length - 1);
+                    vA = vA.join('').split(',').join('');
+                    vA = parseFloat(vA);
+                }
+                let vB = $(keySelector, b).text();
+                if (vB.includes(' VND')) {
+                    vB = vB.split(' ');
+                    vB = vB.slice(0, vB.length - 1);
+                    vB = vB.join('').split(',').join('');
+                    vB = parseFloat(vB);
+                }
+                return (vA < vB) ? -1 : (vA > vB) ? 1 : 0;
+            });
+            parent.append(items);
+        }
+
+        function sortUsingNestedTextDesc(parent, childSelector, keySelector) {
+            const items = parent.children(childSelector).sort(function(a, b) {
+                let vA = $(keySelector, a).text();
+                if (vA.includes(' VND')) {
+                    vA = vA.split(' ');
+                    vA = vA.slice(0, vA.length - 1);
+                    vA = vA.join('').split(',').join('');
+                    vA = parseFloat(vA);
+                }
+                let vB = $(keySelector, b).text();
+                if (vB.includes(' VND')) {
+                    vB = vB.split(' ');
+                    vB = vB.slice(0, vB.length - 1);
+                    vB = vB.join('').split(',').join('');
+                    vB = parseFloat(vB);
+                }
+                return (vA < vB) ? 1 : (vA > vB) ? -1 : 0;
+            });
+            parent.append(items);
+        }
+    </script>
+{{/section}}
+
+<section class="bg-lighter">
+    <div class="container pb-60">
+        <div class="section-title mb-10">
+            <div class="row">
+                <div class="col-md-8">
+                    <h2 class="mt-0 text-uppercase font-28 line-bottom line-height-1">Our <span
+                            class="text-theme-color-2 font-weight-400">COURSES | </span><span
+                            class="text-theme-color-2 font-weight-400">{{#if data.title}}{{data.title}}{{else}}Tất cả khóa học{{/if}}</span></h2>
+                </div>
+                <div class="col-md-4">
+                        <form class="example row" action="/courses" method="GET">
+                            <div class="col-md-5">
+                                <select style="height: 50px;"  name="searchType" class="form-select" aria-label="Default select example">
+                                    <option value="1">Field name</option>
+                                    <option value="2" selected>Course name</option>
+                                </select>
+                            </div>
+                            <div class="col-md-7">
+                                <input type="text" placeholder="Search.." name="keyword">
+                                <button type="submit"><i class="fa fa-search"></i></button>
+                            </div>
+                        </form>
+
+                </div>
+            </div>
+        </div>
+        <nav aria-label="..." style="display: flex; align-items: center; flex-direction:row; justify-content:space-between">
+            <ul class="pagination">
+            </ul>
+            <div class="btn-group sort-btn page-item">
+                <button class="btn btn-primary" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Sort</button>
+                <button class="btn btn-primary dropdown-toggle" data-sort="none"><i class="fa fa-sort"></i></button><!-- .dropdown-toggle adds rounded borders and reduces padding. It does not trigger dropdowns. -->
+                <ul class="dropdown-menu">
+                    <li><a href="javascript: sortUsingNestedTextAsc($('#sortThis'), 'div.courseCard', 'span.price');" tabindex="-1" data-type="alpha">Price ASC</a></li>
+                    <li><a href="javascript: sortUsingNestedTextDesc($('#sortThis'), 'div.courseCard', 'span.price');" tabindex="-1" data-type="alpha">Price DESC</a></li>
+                    <li><a href="javascript: sortUsingNestedTextAsc($('#sortThis'), 'div.courseCard', 'h4.name');" tabindex="-1" data-type="numeric">Name ASC</a></li>
+                    <li><a href="javascript: sortUsingNestedTextDesc($('#sortThis'), 'div.courseCard', 'h4.name');" tabindex="-1" data-type="numeric">Name DESC</a></li>
+                </ul>
+            </div>
+        </nav>
+        <div class="owl-carousel-4col" data-dots="true"></div>
+        <div class="section-content">
+            <div id="sortThis" class="row">
+                {{#each data.courses}}
+                    <div class="col-md-3 col-sm-6 p-10 courseCard">
+                        <div class="item">
+                            <div class="service-block bg-white">
+                                <div class="thumb"><img alt="featured project" src="/assets/client/images/courses/{{this.id}}.png"
+                                                        class="img-fullwidth" height="150"
+                                    onerror="this.onerror=null; this.src='/assets/client/images/not-found.jpg'">
+                                    <h4 class="text-white mt-0 mb-0"><span class="price" {{#if this.discount}}style="text-decoration-line: line-through;"{{/if}}>{{format this.price}} VND</span></h4>
+                                </div>
+                                <div class="content text-left flip p-25 pt-0" style="min-height: 22vh">
+                                    <h4 style="height: 55px;" class="name line-bottom mb-10">{{this.name}}</h4>{{#if this.discount}}- {{this.discount.percent}}
+                                    <i class="fa fa-percent" aria-hidden="true"></i> | New price: {{format this.newPrice}} VND{{/if}}
+                                    {{#if this.isTopCourse}}<div><b>TOP TEN POPULAR COURSES</b></div>{{/if}}
+                                    {{#if this.isTopTenRecentUpload}}<div><strong>RECENTLY UPLOAD</strong></div>{{/if}}
+                                    <p style="height: 35px;">{{{this.tinydes}}}</p>
+                                </div>
+                                <div class="content text-left flip p-25 pt-0 actionButton" data-id="{{{this.id}}}">
+                                    <a style="height: 35px;" class="btn btn-dark btn-theme-colored btn-sm text-uppercase mt-10"
+                                       href="/courses/{{this.id}}">view details</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {{/each}}
+            </div>
+        </div>
+        <nav aria-label="...">
+            <ul class="pagination">
+            </ul>
+        </nav>
+    </div>
+</section>
+
+<form id="addToCart" action="/cart" method="POST" hidden>
+    <label for="courseid">
+        <input type="number" id="courseid" name="courseid">
+    </label>
+</form>
