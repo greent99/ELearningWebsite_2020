@@ -15,17 +15,17 @@
         "express": "~4.16.1",
         "express-handlebars": "^5.2.0",
         "express-handlebars-sections": "^1.0.1",
-        "express-mysql-session": "^2.1.5",
+        "express-mysql-session": "^2.1.6",
         "express-session": "^1.17.1",
         "express-validator": "^6.9.2",
         "google-auth-library": "^6.1.4",
         "googleapis": "^67.0.0",
-        "hbs": "~4.0.4",
+        "hbs": "^4.1.2",
         "http-errors": "~1.6.3",
         "method-override": "^3.0.0",
         "morgan": "~1.9.1",
         "multer": "^1.4.2",
-        "mysql": "^2.18.1",
+        "mysql2": "^2.2.5",
         "nodemailer": "^6.4.17",
         "numeral": "^2.0.6",
         "passport": "^0.4.1",
@@ -36,6 +36,6 @@
     },
     "devDependencies": {
         "nodemon": "^2.0.6",
-        "video.js": "^7.10.2"
+        "video.js": "^7.14.2"
     }
 }

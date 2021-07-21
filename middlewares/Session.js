@@ -1,5 +1,5 @@
 const session = require('express-session');
-const MySQLStore = require('express-mysql-session')(session);
+//const MySQLStore = require('express-mysql-session')(session);
 
 const options = {
   host: process.env.DB_HOST,
@@ -18,7 +18,7 @@ const options = {
   }
 };
 
-const sessionStore = new MySQLStore(options);
+//const sessionStore = new MySQLStore(options);
 
 module.exports = function (app) {
   app.set('trust proxy', 1);
@@ -26,7 +26,7 @@ module.exports = function (app) {
     secret: 'SECRET_KEY',
     resave: false,
     saveUninitialized: true,
-    store: sessionStore,
+    //store: sessionStore,
     cookie: {
       // secure: true
     }
